@@ -1,19 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Windows.Forms.VisualStyles;
 
 namespace Calculator
 {
     public partial class Form1 : Form
     {
-        double score = 0;
+        double operand1 = 0;
+        double operand2 = 0;
+
+        char? op = null;
+        char? input = null;
         public Form1()
         {
             InitializeComponent();
@@ -26,25 +22,86 @@ namespace Calculator
 
         private void number_pressed(object sender, EventArgs e)
         {
-            Button btn = (Button)sender;
-            score = score * 10 + Int32.Parse(btn.Text);
-            textBox1.Text = score.ToString();
-            //label1.Text = label1.Text + btn.Text;
+            input = ((Button)sender).Text[0];
+
+
+            if (op == null)
+            {
+                operand1 = operand1 * 10 + Char.GetNumericValue(input.Value);
+                textBox1.Text = operand1.ToString();
+            }
+            else
+            {
+                operand2 = operand2 * 10 + Char.GetNumericValue(input.Value);
+                textBox1.Text = operand2.ToString();
+            }
+            label1.Text = label1.Text + input;
         }
 
         private void operation_pressed(object sender, EventArgs e)
         {
-            Button btn = (Button)sender;
-            label1.Text = label1.Text + btn.Text;
-            switch (btn.Text)
+            input = ((Button)sender).Text[0];
+            if (input == '=')
             {
-                case "+": break;
-                case "*": break;
-                case "-": break;
-                case "/": break;
+                performOperation();
+                //op = null;
+                //operand2 = 0;
+                textBox1.Text = operand1.ToString();
+                label1.Text += op + operand2.ToString() + '=';
+                //if(label1.Text[label1.Text.Length-1]!='=') label1.Text += "=";
+            }
+            else if (Char.IsDigit(label1.Text[label1.Text.Length - 1]))
+            {
+
+                performOperation();
+                op = input;
+                label1.Text = label1.Text + op;
+
+            }
+            else
+            {
+                op = input;
+                label1.Text = label1.Text.Substring(0, label1.Text.Length - 1) + input;
             }
 
-            
+
+        }
+
+
+        private void performOperation()
+        {
+            if (op != null)
+            {
+                switch (op)
+                {
+                    case '+':
+                        operand1 += operand2;
+                        break;
+                    case '⨉':
+                        operand1 *= operand2;
+                        break;
+                    case '-':
+                        operand1 -= operand2;
+                        break;
+                    case '÷':
+                        operand1 /= operand2;
+                        break;
+                }
+            }
+        }
+
+        private void clear(object sender, EventArgs e)
+        {
+            label1.Text = "";
+            textBox1.Text = "0";
+            operand1 = 0;
+            operand2 = 0;
+            op = null;
+        }
+
+        private void updateLabel()
+        {
+            label1.Text = operand1.ToString() + op;
         }
     }
 }
